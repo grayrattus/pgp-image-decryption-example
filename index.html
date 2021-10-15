@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Felicia and Charlie encryption example PGP</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="HTML5 Example Page">
+    <script src="https://unpkg.com/openpgp@5.0.0/dist/openpgp.js" ></script>
+</head>
+<body>
+  <img id="image" alt="File is either loading or not you put wrong password" />
+  <script type="module">
+    const password = prompt("Type password 'charlieAndFelicia'");
+    (async () => {
+try {
+  const encodedImage = await fetch('charlieAndFelicia.gpg');
+  const buffer = await encodedImage.arrayBuffer();
+  const view = new Uint8Array(buffer);
+
+  const message = await openpgp.readMessage({ binaryMessage: view });
+
+  const decrypted = await openpgp.decrypt({
+    message: message,
+    passwords: [password],
+    format: 'binary'
+  });
+
+  const image =  document.getElementById('image');
+  image.src = URL.createObjectURL( new Blob([decrypted.data], { type: 'image/png'}));
+} catch (e) {
+  console.log(e);
+}
+})()
+
+  </script>
+</body>
+</html>
